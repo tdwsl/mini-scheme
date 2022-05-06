@@ -98,7 +98,7 @@ void loadFile(Instance *ins, const char *filename) {
 	runProgram(ins);
 }
 
-void setVariable(Instance *ins, char *s, Token t) {
+void defVariable(Instance *ins, char *s, Token t) {
 	if(t.type == STRING) {
 		char *ts = malloc(strlen(t.val.s)+1);
 		strcpy(ts, t.val.s);
@@ -120,6 +120,32 @@ void setVariable(Instance *ins, char *s, Token t) {
 	ins->variables = realloc(ins->variables,
 			sizeof(Variable)*(++ins->num_variables));
 	ins->variables[ins->num_variables-1] = (Variable){t, s, ins->depth};
+}
+
+void setVariable(Instance *ins, char *s, Token t) {
+	if(t.type == STRING) {
+		char *ts = malloc(strlen(t.val.s)+1);
+		strcpy(ts, t.val.s);
+		t.val.s = ts;
+	}
+
+	int depth = -1;
+	int ind;
+	for(int i = 0; i < ins->num_variables; i++)
+		if(strcmp(ins->variables[i].s, s) == 0)
+			if(ins->variables[i].depth > depth) {
+				depth = ins->variables[i].depth;
+				ind = i;
+			}
+
+	if(depth != -1) {
+		freeToken(&ins->variables[ind].token);
+		ins->variables[ind].token = t;
+	}
+	else {
+		printf("error: could not set variable %s\n", s);
+		exit(1);
+	}
 }
 
 Token getVariable(Instance *ins, char *s) {

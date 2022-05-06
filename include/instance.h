@@ -47,6 +47,7 @@ void loadString(Instance *ins, char *text);
 void loadFile(Instance *ins, const char *filename);
 Token eval(Instance *ins, Token *t);
 void simplifyArgs(Instance *ins, Token *args, int n);
+void defVariable(Instance *ins, char *s, Token t);
 void setVariable(Instance *ins, char *s, Token t);
 Token getVariable(Instance *ins, char *s);
 void cleanVariables(Instance *ins);

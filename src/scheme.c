@@ -52,7 +52,7 @@ Token fLet(Instance *ins, Token *args, int n) {
 		if(ass[i].children[1].type == LIST)
 			ass[i].children[1] = eval(ins, &ass[i].children[1]);
 
-		setVariable(ins, ass[i].children->val.s, ass[i].children[1]);
+		defVariable(ins, ass[i].children->val.s, ass[i].children[1]);
 	}
 
 	Token t = nilToken();
@@ -81,5 +81,5 @@ void addSchemeFunctions(Instance *ins) {
 	addFunction(ins, fMultiply, "*");
 	addFunction(ins, fDivide, "/");
 	addFunction(ins, fLet, "let");
-	addFunction(ins, fSetf, "setf");
+	addFunction(ins, fSetf, "set!");
 }

@@ -1,6 +1,6 @@
 ; simple program to test my lisp interpreter :^)
 (let ((name "user"))
-  (setf name "world")
+  (set! name "world")
   (display "Hello, ")
   (display name)
   (display "!")
@@ -10,3 +10,12 @@
   (newline))
 (display "out")
 (newline)
+
+;(let loop ((i 0))
+;  (if (< i 10)
+;    (begin
+;      (display "i = ")
+;      (display i)
+;      (display "/9")
+;      (newline)
+;      (loop (+ i 1)))))
