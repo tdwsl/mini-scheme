@@ -14,12 +14,15 @@ Instance *newInstance() {
 	ins->variables = 0;
 	ins->num_functions = 0;
 	ins->program = newList();
+	ins->depth = 0;
 	return ins;
 }
 
 void freeInstance(Instance *ins) {
 	freeToken(&ins->program);
 	free(ins->functions);
+	if(ins->variables)
+		free(ins->variables);
 	free(ins);
 }
 
@@ -57,6 +60,8 @@ void simplifyArgs(Instance *ins, Token *args, int n) {
 	for(int i = 0; i < n; i++) {
 		if(args[i].type == LIST)
 			args[i] = eval(ins, &args[i]);
+		if(args[i].type == SYMBOL)
+			args[i] = getVariable(ins, args[i].val.s);
 	}
 }
 
@@ -91,4 +96,59 @@ void loadFile(Instance *ins, const char *filename) {
 	free(str);
 	
 	runProgram(ins);
+}
+
+void setVariable(Instance *ins, char *s, Token t) {
+	for(int i = 0; i < ins->num_variables; i++)
+		if(strcmp(ins->variables[i].s, s) == 0)
+			if(ins->variables[i].depth == ins->depth) {
+				ins->variables[i].token = t;
+				return;
+			}
+
+	if(t.type == STRING) {
+		char *ts = malloc(strlen(t.val.s)+1);
+		strcpy(ts, t.val.s);
+		t.val.s = ts;
+	}
+
+	char *b = malloc(strlen(s)+1);
+	strcpy(b, s);
+	s = b;
+
+	ins->variables = realloc(ins->variables,
+			sizeof(Variable)*(++ins->num_variables));
+	ins->variables[ins->num_variables-1] = (Variable){t, s, ins->depth};
+}
+
+Token getVariable(Instance *ins, char *s) {
+	int depth = -1;
+	int ind;
+	for(int i = 0; i < ins->num_variables; i++)
+		if(strcmp(ins->variables[i].s, s) == 0)
+			if(ins->variables[i].depth > depth) {
+				depth = ins->variables[i].depth;
+				ind = i;
+			}
+	if(depth != -1)
+		return ins->variables[ind].token;
+
+	printf("error: could not find variable %s\n", s);
+	exit(1);
+}
+
+void cleanVariables(Instance *ins) {
+	Variable *nu = 0;
+	int nusz = 0;
+	for(int i = 0; i < ins->num_variables; i++)
+		if(ins->variables[i].depth <= ins->depth) {
+			nu = realloc(nu, sizeof(Variable)*(++nusz));
+			nu[nusz-1] = ins->variables[i];
+			freeToken(&ins->variables[i].token);
+			free(ins->variables[i].s);
+		}
+	free(ins->variables);
+	ins->variables = 0;
+	ins->num_variables = nusz;
+	ins->variables = nu;
 }

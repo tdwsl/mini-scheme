@@ -6,7 +6,8 @@
 
 typedef struct variable {
 	Token token;
-	char *identifier;
+	char *s;
+	int depth;
 } Variable;
 
 typedef struct instance {
@@ -15,6 +16,7 @@ typedef struct instance {
 	int num_functions;
 	struct variable *variables;
 	int num_variables;
+	int depth;
 } Instance;
 
 #define defArithmeticFun(OP, NAME)\
@@ -45,5 +47,8 @@ void loadString(Instance *ins, char *text);
 void loadFile(Instance *ins, const char *filename);
 Token eval(Instance *ins, Token *t);
 void simplifyArgs(Instance *ins, Token *args, int n);
+void setVariable(Instance *ins, char *s, Token t);
+Token getVariable(Instance *ins, char *s);
+void cleanVariables(Instance *ins);
 
 #endif

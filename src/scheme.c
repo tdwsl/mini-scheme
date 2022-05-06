@@ -38,6 +38,32 @@ defArithmeticFun(-, fMinus);
 defArithmeticFun(*, fMultiply);
 defArithmeticFun(/, fDivide);
 
+Token fLet(Instance *ins, Token *args, int n) {
+	assert(args[0].type == LIST);
+
+	ins->depth++;
+
+	int sz = args[0].num_children;
+	Token *ass = args[0].children;
+	for(int i = 0; i < sz; i++) {
+		assert(ass[i].type == LIST);
+		assert(ass[i].num_children == 2);
+		assert(ass[i].children[0].type == SYMBOL);
+		if(ass[i].children[1].type == LIST)
+			ass[i].children[1] = eval(ins, &ass[i].children[1]);
+
+		setVariable(ins, ass[i].children->val.s, ass[i].children[1]);
+	}
+
+	Token t = nilToken();
+	for(int i = 1; i < n; i++)
+		t = eval(ins, &args[i]);
+
+	ins->depth--;
+	cleanVariables(ins);
+	return t;
+}
+
 void addSchemeFunctions(Instance *ins) {
 	addFunction(ins, fDisplay, "display");
 	addFunction(ins, fNewline, "newline");
@@ -45,4 +71,5 @@ void addSchemeFunctions(Instance *ins) {
 	addFunction(ins, fMinus, "-");
 	addFunction(ins, fMultiply, "*");
 	addFunction(ins, fDivide, "/");
+	addFunction(ins, fLet, "let");
 }
