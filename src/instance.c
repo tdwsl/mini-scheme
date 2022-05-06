@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <assert.h>
 #include "function.h"
 #include "token.h"
 #include "instance.h"
@@ -20,10 +21,6 @@ void freeInstance(Instance *ins) {
 	freeToken(&ins->program);
 	free(ins->functions);
 	free(ins);
-}
-
-void loadString(Instance *ins, char *text) {
-	getList(&ins->program, text);
 }
 
 Token eval(Instance *ins, Token *t) {
@@ -56,7 +53,42 @@ Token eval(Instance *ins, Token *t) {
 	return k;
 }
 
+void simplifyArgs(Instance *ins, Token *args, int n) {
+	for(int i = 0; i < n; i++) {
+		if(args[i].type == LIST)
+			args[i] = eval(ins, &args[i]);
+	}
+}
+
 void runProgram(Instance *ins) {
 	for(int i = 0; i < ins->program.num_children; i++)
 		eval(ins, &ins->program.children[i]);
+}
+
+void loadString(Instance *ins, char *text) {
+	getList(&ins->program, text);
+	runProgram(ins);
+}
+
+void loadFile(Instance *ins, const char *filename) {
+	int max = 200;
+	char *str = malloc(max);
+	int len = 0;
+
+	FILE *fp = fopen(filename, "r");
+	assert(fp);
+	while(!feof(fp)) {
+		str[len++] = fgetc(fp);
+		if(len > max-30) {
+			max += 70;
+			str = realloc(str, max);
+		}
+	}
+	str[len-1] = 0;
+	fclose(fp);
+
+	getList(&ins->program, str);
+	free(str);
+	
+	runProgram(ins);
 }

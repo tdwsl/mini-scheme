@@ -27,6 +27,8 @@ typedef struct token {
 
 #define newList() (Token) { LIST, {0}, 0, 0 }
 #define nilToken() (Token) { NIL, {0}, 0, 0 }
+#define newInt(I) (Token) { INTEGER, {(int)I}, 0, 0 }
+#define newFloat(F) (Token) { FLOAT, {.f=F}, 0, 0 }
 void freeToken(Token *t);
 
 #endif

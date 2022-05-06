@@ -2,9 +2,12 @@
 #include <assert.h>
 #include "instance.h"
 #include "function.h"
+#include "token.h"
 
 Token fDisplay(Instance *ins, Token *args, int n) {
 	assert(n == 1);
+
+	simplifyArgs(ins, args, n);
 
 	switch(args[0].type) {
 	case STRING:
@@ -14,7 +17,7 @@ Token fDisplay(Instance *ins, Token *args, int n) {
 		printf("%d", args[0].val.i);
 		break;
 	case FLOAT:
-		printf("%f", args[0].val.f);
+		printf("%g", args[0].val.f);
 		break;
 	default:
 		printf("(?)");
@@ -29,13 +32,17 @@ Token fNewline(Instance *ins, Token *args, int n) {
 	printf("\n");
 	return nilToken();
 }
-int main() {
-	Instance *ins = newInstance();
+
+defArithmeticFun(+, fPlus);
+defArithmeticFun(-, fMinus);
+defArithmeticFun(*, fMultiply);
+defArithmeticFun(/, fDivide);
+
+void addSchemeFunctions(Instance *ins) {
 	addFunction(ins, fDisplay, "display");
 	addFunction(ins, fNewline, "newline");
-	/*loadString(ins, "(setq num (+ 47 1)) (write-line (getf hola))");*/
-	loadString(ins, "(display \"Hello world!\") (newline)");
-	runProgram(ins);
-	freeInstance(ins);
-	return 0;
+	addFunction(ins, fPlus, "+");
+	addFunction(ins, fMinus, "-");
+	addFunction(ins, fMultiply, "*");
+	addFunction(ins, fDivide, "/");
 }

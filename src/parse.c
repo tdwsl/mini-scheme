@@ -47,6 +47,35 @@ void handleBraces(Token *list) {
 	}
 }
 
+bool stringIsFloat(char *s) {
+	int p = 0;
+	for(int i = 0; s[i]; i++) {
+		if(s[i] == '-') {
+			if(i > 0)
+				return false;
+		}
+		else if(s[i] == '.') {
+			if(p++)
+				return false;
+		}
+		else if(s[i] < '0' || s[i] > '9')
+			return false;
+	}
+	return true;
+}
+
+bool stringIsInt(char *s) {
+	for(int i = 0; s[i]; i++) {
+		if(s[i] == '-') {
+			if(i > 0)
+				return false;
+		}
+		else if(s[i] < '0' || s[i] > '9')
+			return false;
+	}
+	return true;
+}
+
 void addToken(Token *list, char type, char *str, int *len) {
 	list->children = realloc(list->children,
 			sizeof(Token)*(++list->num_children));
@@ -159,6 +188,24 @@ void getList(Token *list, char *text) {
 		addToken(list, SYMBOL, str, &len);
 
 	free(str);
+
+	for(int i = 0; i < list->num_children; i++) {
+		Token *t = &list->children[i];
+		if(t->type != SYMBOL)
+			continue;
+
+		if(stringIsInt(t->val.s)) {
+			t->type = INTEGER;
+			t->val.i = atoi(t->val.s);
+			/* vvv causes segfault :( */
+			/*free(t->val.s);*/
+		}
+		else if(stringIsFloat(t->val.s)) {
+			t->type = FLOAT;
+			t->val.f = atof(t->val.s);
+			free(t->val.s);
+		}
+	}
 
 	/*for(int i = 0; i < list->num_children; i++)
 		printf("%s\n", list->children[i].val.s);*/
