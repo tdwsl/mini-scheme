@@ -64,6 +64,15 @@ Token fLet(Instance *ins, Token *args, int n) {
 	return t;
 }
 
+Token fSetf(Instance *ins, Token *args, int n) {
+	assert(n == 2);
+	assert(args[0].type == SYMBOL);
+	simplifyArgs(ins, args+1, 1);
+
+	setVariable(ins, args[0].val.s, args[1]);
+	return args[1];
+}
+
 void addSchemeFunctions(Instance *ins) {
 	addFunction(ins, fDisplay, "display");
 	addFunction(ins, fNewline, "newline");
@@ -72,4 +81,5 @@ void addSchemeFunctions(Instance *ins) {
 	addFunction(ins, fMultiply, "*");
 	addFunction(ins, fDivide, "/");
 	addFunction(ins, fLet, "let");
+	addFunction(ins, fSetf, "setf");
 }

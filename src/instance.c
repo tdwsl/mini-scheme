@@ -99,18 +99,19 @@ void loadFile(Instance *ins, const char *filename) {
 }
 
 void setVariable(Instance *ins, char *s, Token t) {
-	for(int i = 0; i < ins->num_variables; i++)
-		if(strcmp(ins->variables[i].s, s) == 0)
-			if(ins->variables[i].depth == ins->depth) {
-				ins->variables[i].token = t;
-				return;
-			}
-
 	if(t.type == STRING) {
 		char *ts = malloc(strlen(t.val.s)+1);
 		strcpy(ts, t.val.s);
 		t.val.s = ts;
 	}
+
+	for(int i = 0; i < ins->num_variables; i++)
+		if(strcmp(ins->variables[i].s, s) == 0)
+			if(ins->variables[i].depth == ins->depth) {
+				freeToken(&ins->variables[i].token);
+				ins->variables[i].token = t;
+				return;
+			}
 
 	char *b = malloc(strlen(s)+1);
 	strcpy(b, s);

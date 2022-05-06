@@ -1,5 +1,6 @@
 ; simple program to test my lisp interpreter :^)
-(let ((name "world"))
+(let ((name "user"))
+  (setf name "world")
   (display "Hello, ")
   (display name)
   (display "!")
