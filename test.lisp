@@ -11,11 +11,11 @@
 (display "out")
 (newline)
 
-;(let loop ((i 0))
-;  (if (< i 10)
-;    (begin
-;      (display "i = ")
-;      (display i)
-;      (display "/9")
-;      (newline)
-;      (loop (+ i 1)))))
+(let loop ((i 0))
+  (if (< i 10)
+    (begin
+      (display "i = ")
+      (display i)
+      (display "/9")
+      (newline)
+      (loop (+ i 1)))))

@@ -7,5 +7,11 @@ void freeToken(Token *t) {
 	else if(t->type == LIST) {
 		for(int i = 0; i < t->num_children; i++)
 			freeToken(&t->children[i]);
+		free(t->children);
+	}
+	else if(t->type == FUNCTION) {
+		for(int i = 0; i < t->num_variables; i++)
+			free(t->variables[i]);
+		free(t->variables);
 	}
 }

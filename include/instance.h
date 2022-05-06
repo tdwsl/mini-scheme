@@ -1,6 +1,7 @@
 #ifndef INSTANCE_H
 #define INSTANCE_H
 
+#include <stdbool.h>
 #include "token.h"
 #include "function.h"
 
@@ -51,5 +52,9 @@ void defVariable(Instance *ins, char *s, Token t);
 void setVariable(Instance *ins, char *s, Token t);
 Token getVariable(Instance *ins, char *s);
 void cleanVariables(Instance *ins);
+Token callVariable(Instance *ins, char *s, Token *args, int n);
+bool isVariable(Instance *ins, char *s);
+void addVarFunction(Instance *ins, char *s, Token *body, int n,
+		char **variables, int num_variables);
 
 #endif

@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
+#include <stdbool.h>
 #include "function.h"
 #include "token.h"
 #include "instance.h"
@@ -167,15 +168,68 @@ Token getVariable(Instance *ins, char *s) {
 void cleanVariables(Instance *ins) {
 	Variable *nu = 0;
 	int nusz = 0;
-	for(int i = 0; i < ins->num_variables; i++)
+	for(int i = 0; i < ins->num_variables; i++) {
 		if(ins->variables[i].depth <= ins->depth) {
 			nu = realloc(nu, sizeof(Variable)*(++nusz));
 			nu[nusz-1] = ins->variables[i];
-			freeToken(&ins->variables[i].token);
+		}
+		else {
+			printf("cleaning %s d%d/%d...\n", ins->variables[i].s,
+					ins->variables[i].depth, ins->depth);
+			//freeToken(&ins->variables[i].token);
 			free(ins->variables[i].s);
 		}
+	}
 	free(ins->variables);
 	ins->variables = 0;
 	ins->num_variables = nusz;
 	ins->variables = nu;
+}
+
+bool isVariable(Instance *ins, char *s) {
+	for(int i = 0; i < ins->num_variables; i++)
+		if(strcmp(ins->variables[i].s, s) == 0)
+			return true;
+	return false;
+}
+
+void addVarFunction(Instance *ins, char *s, Token *args, int n,
+		char **variables, int num_variables) {
+	Token t;
+	t.children = args;
+	t.num_children = n;
+	t.type = FUNCTION;
+
+	t.num_variables = num_variables;
+	t.variables = malloc(sizeof(char*)*num_variables);
+	for(int i = 0; i < num_variables; i++) {
+		t.variables[i] = malloc(strlen(variables[i])+1);
+		strcpy(t.variables[i], variables[i]);
+	}
+
+	defVariable(ins, s, t);
+}
+
+Token callVariable(Instance *ins, char *s, Token *args, int n) {
+	Token t = getVariable(ins, s);
+	if(t.type != FUNCTION) {
+		printf("error: %s is not a function\n", s);
+		exit(1);
+	}
+
+	printf("calling %s...\n", s);
+	assert(n == t.num_variables);
+	ins->depth++;
+	for(int i = 0; i < n; i++)
+		defVariable(ins, t.variables[i], args[i]);
+
+	Token r;
+	for(int i = 0; i < t.num_children; i++)
+		r = eval(ins, &t.children[i]);
+
+	ins->depth--;
+	cleanVariables(ins);
+	printf("called %s\n", s);
+
+	return r;
 }

@@ -15,6 +15,6 @@ typedef struct function {
 } Function;
 
 void addFunction(Instance *ins, cfun fun, const char *s);
-Token doFunction(Instance *ins, const char *s, Token *args, int n);
+Token doFunction(Instance *ins, char *s, Token *args, int n);
 
 #endif

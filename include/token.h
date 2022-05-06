@@ -9,6 +9,8 @@ enum {
 	LIST,
 	SYMBOL,
 	NIL,
+	FUNCTION,
+	HASHT,
 };
 
 typedef struct token {
@@ -23,12 +25,15 @@ typedef struct token {
 
 	struct token *children;
 	int num_children;
+	char **variables;
+	int num_variables;
 } Token;
 
-#define newList() (Token) { LIST, {0}, 0, 0 }
-#define nilToken() (Token) { NIL, {0}, 0, 0 }
-#define newInt(I) (Token) { INTEGER, {(int)I}, 0, 0 }
-#define newFloat(F) (Token) { FLOAT, {.f=F}, 0, 0 }
+#define newList() (Token) { LIST, {0}, 0, 0, 0, 0 }
+#define nilToken() (Token) { NIL, {0}, 0, 0, 0, 0 }
+#define trueToken() (Token) { HASHT, {0}, 0, 0, 0, 0 }
+#define newInt(I) (Token) { INTEGER, {(int)I}, 0, 0, 0, 0 }
+#define newFloat(F) (Token) { FLOAT, {.f=F}, 0, 0, 0, 0 }
 void freeToken(Token *t);
 
 #endif

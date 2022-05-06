@@ -5,7 +5,10 @@
 #include "token.h"
 #include "instance.h"
 
-Token doFunction(Instance *ins, const char *s, Token *args, int n) {
+Token doFunction(Instance *ins, char *s, Token *args, int n) {
+	if(isVariable(ins, s))
+		return callVariable(ins, s, args, n);
+
 	for(int i = 0; i < ins->num_functions; i++)
 		if(strcmp(ins->functions[i].s, s) == 0)
 			return ins->functions[i].fun(ins, args, n);
