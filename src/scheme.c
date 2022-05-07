@@ -22,6 +22,15 @@ Token fDisplay(Instance *ins, Token *args, int n) {
 	case FLOAT:
 		printf("%g", args[0].val.f);
 		break;
+	case CHAR:
+		printf("%c", args[0].val.c);
+		break;
+	case HASHT:
+		printf("#t");
+		break;
+	case NIL:
+		printf("#f");
+		break;
 	default:
 		printf("(?)");
 		break;
@@ -135,17 +144,24 @@ Token fIf(Instance *ins, Token *args, int n) {
 void getAB(Token *args, float *a, float *b) {
 	if(args[0].type == INTEGER)
 		*a = args[0].val.i;
-	else
+	else if(args[0].type == FLOAT)
 		*a = args[0].val.f;
+	else
+		*a = args[0].val.c;
+
 	if(args[1].type == INTEGER)
 		*b = args[1].val.i;
-	else
+	else if(args[1].type == FLOAT)
 		*b = args[1].val.f;
+	else
+		*b = args[1].val.c;
 }
 
 Token fEquals(Instance *ins, Token *args, int n) {
 	assert(n == 2);
 	simplifyArgs(ins, args, n);
+	assert(args[0].type != STRING && args[1].type != STRING);
+
 	if((args[0].type == INTEGER || args[0].type == FLOAT) &&
 			(args[1].type == INTEGER || args[1].type == FLOAT)) {
 		float a, b;
@@ -159,20 +175,31 @@ Token fEquals(Instance *ins, Token *args, int n) {
 		return nilToken();
 	else if(args[0].type == NIL || args[0].type == HASHT)
 		return trueToken();
-	else if(args[0].type == STRING)
-		return (strcmp(args[0].val.s, args[1].val.s) == 0) ?
+	else if(args[0].type == CHAR)
+		return (args[0].val.c == args[1].val.c) ?
 			trueToken() : nilToken();
 	else
 		return nilToken();
+}
+
+Token fStringEquals(Instance *ins, Token *args, int n) {
+	assert(n == 2);
+	simplifyArgs(ins, args, n);
+	assert(args[0].type == STRING && args[1].type == STRING);
+
+	return (strcmp(args[0].val.s, args[1].val.s) == 0) ?
+		trueToken() : nilToken();
 }
 
 Token fGreater(Instance *ins, Token *args, int n) {
 	assert(n == 2);
 	simplifyArgs(ins, args, n);
 
-	if(args[0].type != INTEGER && args[0].type != FLOAT)
+	if(args[0].type != INTEGER && args[0].type != FLOAT
+			&& args[0].type != CHAR)
 		return nilToken();
-	if(args[1].type != INTEGER && args[1].type != FLOAT)
+	if(args[1].type != INTEGER && args[1].type != FLOAT
+			&& args[1].type != CHAR)
 		return nilToken();
 
 	float a, b;
@@ -188,9 +215,11 @@ Token fLess(Instance *ins, Token *args, int n) {
 	assert(n == 2);
 	simplifyArgs(ins, args, n);
 
-	if(args[0].type != INTEGER && args[0].type != FLOAT)
+	if(args[0].type != INTEGER && args[0].type != FLOAT
+			&& args[0].type != CHAR)
 		return nilToken();
-	if(args[1].type != INTEGER && args[1].type != FLOAT)
+	if(args[1].type != INTEGER && args[1].type != FLOAT
+			&& args[1].type != CHAR)
 		return nilToken();
 
 	float a, b;
@@ -206,9 +235,11 @@ Token fGreaterEq(Instance *ins, Token *args, int n) {
 	assert(n == 2);
 	simplifyArgs(ins, args, n);
 
-	if(args[0].type != INTEGER && args[0].type != FLOAT)
+	if(args[0].type != INTEGER && args[0].type != FLOAT
+			&& args[0].type != CHAR)
 		return nilToken();
-	if(args[1].type != INTEGER && args[1].type != FLOAT)
+	if(args[1].type != INTEGER && args[1].type != FLOAT
+			&& args[1].type != CHAR)
 		return nilToken();
 
 	float a, b;
@@ -224,9 +255,11 @@ Token fLessEq(Instance *ins, Token *args, int n) {
 	assert(n == 2);
 	simplifyArgs(ins, args, n);
 
-	if(args[0].type != INTEGER && args[0].type != FLOAT)
+	if(args[0].type != INTEGER && args[0].type != FLOAT
+			&& args[0].type != CHAR)
 		return nilToken();
-	if(args[1].type != INTEGER && args[1].type != FLOAT)
+	if(args[1].type != INTEGER && args[1].type != FLOAT
+			&& args[1].type != CHAR)
 		return nilToken();
 
 	float a, b;
@@ -290,6 +323,50 @@ Token fRead(Instance *ins, Token *args, int n) {
 	return t;
 }
 
+Token fStringRef(Instance *ins, Token *args, int n) {
+	assert(n == 2);
+	simplifyArgs(ins, args, n);
+	assert(args[0].type == STRING);
+	assert(args[1].type == INTEGER);
+
+	assert(args[1].val.i < strlen(args[0].val.s) && args[1].val.i >= 0);
+	return newChar(args[0].val.s[args[1].val.i]);
+}
+
+Token fVector(Instance *ins, Token *args, int n) {
+	simplifyArgs(ins, args, n);
+
+	Token t;
+	t.type = VECTOR;
+	t.children = malloc(sizeof(Token)*n);
+	for(int i = 0; i < n; i++) {
+		t.children[i] = args[i];
+		seperateToken(&t.children[i]);
+	}
+	t.num_children = n;
+	return t;
+}
+
+Token fVectorRef(Instance *ins, Token *args, int n) {
+	assert(n == 2);
+	simplifyArgs(ins, args, n);
+	assert(args[0].type == VECTOR);
+	assert(args[1].type == INTEGER);
+	assert(args[1].val.i >= 0 && args[1].val.i < args[0].num_children);
+	Token t = args[0].children[args[1].val.i];
+	return t;
+}
+
+Token fLength(Instance *ins, Token *args, int n) {
+	assert(n == 1);
+	simplifyArgs(ins, args, n);
+	assert(args[0].type == VECTOR || args[0].type == STRING);
+	if(args[0].type == VECTOR)
+		return newInt(args[0].num_children);
+	else
+		return newInt(strlen(args[0].val.s));
+}
+
 void addSchemeFunctions(Instance *ins) {
 	addFunction(ins, fDisplay, "display");
 	addFunction(ins, fNewline, "newline");
@@ -309,4 +386,9 @@ void addSchemeFunctions(Instance *ins) {
 	addFunction(ins, fDefine, "define");
 	addFunction(ins, fQuit, "exit");
 	addFunction(ins, fRead, "read");
+	addFunction(ins, fStringEquals, "string=?");
+	addFunction(ins, fStringRef, "string-ref");
+	addFunction(ins, fVector, "vector");
+	addFunction(ins, fVectorRef, "vector-ref");
+	addFunction(ins, fLength, "length");
 }

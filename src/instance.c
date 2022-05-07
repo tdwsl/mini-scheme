@@ -116,6 +116,8 @@ void defVariable(Instance *ins, char *s, Token t) {
 		strcpy(ts, t.val.s);
 		t.val.s = ts;
 	}
+	/*if(t.type != VECTOR)
+		seperateToken(&t);*/
 
 	for(int i = 0; i < ins->num_variables; i++)
 		if(strcmp(ins->variables[i].s, s) == 0)
@@ -140,6 +142,8 @@ void setVariable(Instance *ins, char *s, Token t) {
 		strcpy(ts, t.val.s);
 		t.val.s = ts;
 	}
+	/*if(t.type != VECTOR)
+		seperateToken(&t);*/
 
 	int depth = -1;
 	int ind;
@@ -185,7 +189,8 @@ void cleanVariables(Instance *ins) {
 			nu[nusz-1] = ins->variables[i];
 		}
 		else {
-			freeToken(&ins->variables[i].token);
+			if(ins->variables[i].token.type != VECTOR)
+				freeToken(&ins->variables[i].token);
 			free(ins->variables[i].s);
 		}
 	}

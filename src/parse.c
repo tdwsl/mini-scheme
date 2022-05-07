@@ -218,6 +218,13 @@ void getList(Token *list, char *text) {
 			t->type = NIL;
 			free(t->val.s);
 		}
+		else if(t->val.s[0] == '#' && strlen(t->val.s) == 3) {
+			if(t->val.s[1] != '\\')
+				continue;
+			t->type = CHAR;
+			t->val.c = t->val.s[2];
+			free(t->val.s);
+		}
 	}
 
 	handleBraces(list);

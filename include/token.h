@@ -11,6 +11,7 @@ enum {
 	NIL,
 	FUNCTION,
 	HASHT,
+	VECTOR,
 };
 
 typedef struct token {
@@ -34,6 +35,9 @@ typedef struct token {
 #define trueToken() (Token) { HASHT, {0}, 0, 0, 0, 0 }
 #define newInt(I) (Token) { INTEGER, {(int)I}, 0, 0, 0, 0 }
 #define newFloat(F) (Token) { FLOAT, {.f=F}, 0, 0, 0, 0 }
+#define newChar(C) (Token) { CHAR, {.c=C}, 0, 0, 0, 0 }
+#define newVector() (Token) { VECTOR, {0}, 0, 0, 0, 0 }
 void freeToken(Token *t);
+void seperateToken(Token *t);
 
 #endif
