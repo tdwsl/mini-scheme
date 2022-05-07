@@ -1,1 +1,1 @@
-gcc -Iinclude src/*.c -o mylisp
+gcc -Iinclude src/*.c -o scheme

@@ -43,6 +43,7 @@ Token eval(Instance *ins, Token *t) {
 		return nilToken();
 
 	if(t->type != LIST) {
+		return *t;
 		printf("error: cannot evaluate non-list\n");
 		exit(1);
 	}

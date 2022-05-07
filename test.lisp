@@ -56,3 +56,5 @@
 	(display (vector-ref (vector-ref mylist 0) i))
 	(newline)
 	(loop (+ i 1))))))
+
+(if #t (newline))
