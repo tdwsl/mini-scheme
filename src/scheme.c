@@ -236,6 +236,29 @@ Token fLessEq(Instance *ins, Token *args, int n) {
 		return nilToken();
 }
 
+Token fDefine(Instance *ins, Token *args, int n) {
+	assert(args[0].type == LIST);
+	for(int i = 0; i < args[0].num_children; i++)
+		assert(args[0].children[i].type == SYMBOL);
+
+	int num_variables = args[0].num_children-1;
+	char **variables = malloc(sizeof(char*)*num_variables);
+
+	for(int i = 0; i < num_variables; i++)
+		variables[i] = args[0].children[i+1].val.s;
+
+	addVarFunction(ins, args[0].children[0].val.s, args+1, n-1,
+			variables, num_variables);
+
+	free(variables);
+	return getVariable(ins, args[0].children[0].val.s);
+}
+
+Token fQuit(Instance *ins, Token *args, int n) {
+	ins->quit = true;
+	return nilToken();
+}
+
 void addSchemeFunctions(Instance *ins) {
 	addFunction(ins, fDisplay, "display");
 	addFunction(ins, fNewline, "newline");
@@ -252,4 +275,6 @@ void addSchemeFunctions(Instance *ins) {
 	addFunction(ins, fGreaterEq, ">=");
 	addFunction(ins, fLess, "<");
 	addFunction(ins, fLessEq, "<=");
+	addFunction(ins, fDefine, "define");
+	addFunction(ins, fQuit, "quit");
 }

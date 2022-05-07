@@ -16,6 +16,7 @@ Instance *newInstance() {
 	ins->num_functions = 0;
 	ins->program = newList();
 	ins->depth = 0;
+	ins->quit = false;
 	return ins;
 }
 
@@ -38,6 +39,9 @@ void freeInstance(Instance *ins) {
 }
 
 Token eval(Instance *ins, Token *t) {
+	if(ins->quit)
+		return nilToken();
+
 	if(t->type != LIST) {
 		printf("error: cannot evaluate non-list\n");
 		exit(1);
@@ -74,7 +78,7 @@ void simplifyArgs(Instance *ins, Token *args, int n) {
 }
 
 void runProgram(Instance *ins) {
-	for(int i = 0; i < ins->program.num_children; i++)
+	for(int i = 0; i < ins->program.num_children && !ins->quit; i++)
 		eval(ins, &ins->program.children[i]);
 }
 

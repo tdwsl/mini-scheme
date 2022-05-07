@@ -6,6 +6,8 @@
 #include "instance.h"
 
 Token doFunction(Instance *ins, char *s, Token *args, int n) {
+	if(ins->quit)
+		return nilToken();
 	if(isVariable(ins, s))
 		return callVariable(ins, s, args, n);
 

@@ -18,6 +18,7 @@ typedef struct instance {
 	struct variable *variables;
 	int num_variables;
 	int depth;
+	bool quit;
 } Instance;
 
 #define defArithmeticFun(OP, NAME)\

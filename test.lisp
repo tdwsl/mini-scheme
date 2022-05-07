@@ -12,10 +12,20 @@
 (newline)
 
 (let loop ((i 0))
-  (if (< i 10)
+  (if (< i 6)
     (begin
       (display "i = ")
       (display i)
-      (display "/9")
+      (display "/5")
       (newline)
       (loop (+ i 1)))))
+
+(quit)
+
+(define (hello-again name)
+  (display "Hello again, ")
+  (display name)
+  (display "!")
+  (newline))
+
+(hello-again "world")
