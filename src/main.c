@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "instance.h"
 #include "scheme.h"
 

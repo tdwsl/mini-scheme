@@ -174,8 +174,6 @@ void cleanVariables(Instance *ins) {
 			nu[nusz-1] = ins->variables[i];
 		}
 		else {
-			printf("cleaning %s d%d/%d...\n", ins->variables[i].s,
-					ins->variables[i].depth, ins->depth);
 			//freeToken(&ins->variables[i].token);
 			free(ins->variables[i].s);
 		}
@@ -217,7 +215,8 @@ Token callVariable(Instance *ins, char *s, Token *args, int n) {
 		exit(1);
 	}
 
-	printf("calling %s...\n", s);
+	simplifyArgs(ins, args, n);
+
 	assert(n == t.num_variables);
 	ins->depth++;
 	for(int i = 0; i < n; i++)
@@ -229,7 +228,6 @@ Token callVariable(Instance *ins, char *s, Token *args, int n) {
 
 	ins->depth--;
 	cleanVariables(ins);
-	printf("called %s\n", s);
 
 	return r;
 }

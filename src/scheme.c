@@ -77,10 +77,8 @@ Token fLet(Instance *ins, Token *args, int n) {
 		ins->depth++;
 		addVarFunction(ins, (args-1)[0].val.s, args+1, n-2,
 				variables, args[0].num_children);
-		ins->depth++;
 		Token t = doFunction(ins, (args-1)[0].val.s,
 				vals, args[0].num_children);
-		ins->depth--;
 		ins->depth--;
 		free(vals);
 		free(variables);
