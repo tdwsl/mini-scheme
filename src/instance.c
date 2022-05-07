@@ -21,9 +21,19 @@ Instance *newInstance() {
 
 void freeInstance(Instance *ins) {
 	freeToken(&ins->program);
-	free(ins->functions);
+
+	for(int i = 0; i < ins->num_variables; i++) {
+		freeToken(&ins->variables[i].token);
+		free(ins->variables[i].s);
+	}
 	if(ins->variables)
 		free(ins->variables);
+
+	if(ins->functions)
+		free(ins->functions);
+
+	//printf("0x%x\n", ins);
+
 	free(ins);
 }
 
@@ -43,16 +53,13 @@ Token eval(Instance *ins, Token *t) {
 	for(int i = 0; i < sz; i++)
 		tokens[i] = t->children[i+1];
 
-	/*for(int i = 0; i < sz; i++)
-		if(tokens[i].type == SYMBOL)
-			tokens[i] = eval(ins, getVariable(tokens[i].s));
-	*/
-
 	Token k = doFunction(ins, t->children[0].val.s, tokens, sz);
 
-	for(int i = 0; i < sz; i++)
-		if(tokens[i].type != t->children[i+1].type)
+	/*for(int i = 0; i < sz; i++)
+		if(tokens[i].type != t->children[i+1].type) {
+			printf("%d\n", i);
 			freeToken(&tokens[i]);
+		}*/
 	free(tokens);
 	return k;
 }
@@ -174,7 +181,7 @@ void cleanVariables(Instance *ins) {
 			nu[nusz-1] = ins->variables[i];
 		}
 		else {
-			//freeToken(&ins->variables[i].token);
+			freeToken(&ins->variables[i].token);
 			free(ins->variables[i].s);
 		}
 	}

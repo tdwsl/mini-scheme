@@ -83,7 +83,7 @@ void addToken(Token *list, char type, char *str, int *len) {
 
 	t->type = type;
 
-	t->val.s = malloc(*len+1);
+	t->val.s = malloc((*len)+1);
 	for(int i = 0; i < *len; i++)
 		t->val.s[i] = str[i];
 	t->val.s[*len] = 0;
@@ -189,11 +189,13 @@ void getList(Token *list, char *text) {
 
 	free(str);
 
+	int f = 0;
 	for(int i = 0; i < list->num_children; i++) {
 		Token *t = &list->children[i];
 		if(t->type != SYMBOL)
 			continue;
 
+		/*printf("%s (0x%x)\n", t->val.s, t->val.s);*/
 		if(stringIsInt(t->val.s)) {
 			t->type = INTEGER;
 			t->val.i = atoi(t->val.s);
@@ -205,12 +207,9 @@ void getList(Token *list, char *text) {
 			t->val.f = atof(t->val.s);
 			free(t->val.s);
 		}
+		/*else
+			printf("^^^ not freeing\n");*/
 	}
 
-	/*for(int i = 0; i < list->num_children; i++)
-		printf("%s\n", list->children[i].val.s);*/
-
 	handleBraces(list);
-
-	/*debugWrite(list, 0);*/
 }
