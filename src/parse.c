@@ -209,6 +209,15 @@ void getList(Token *list, char *text) {
 		}
 		/*else
 			printf("^^^ not freeing\n");*/
+		else if(strcmp(t->val.s, "#t") == 0) {
+			t->type = HASHT;
+			free(t->val.s);
+		}
+		else if(strcmp(t->val.s, "#f") == 0 ||
+				strcmp(t->val.s, "nil") == 0) {
+			t->type = NIL;
+			free(t->val.s);
+		}
 	}
 
 	handleBraces(list);

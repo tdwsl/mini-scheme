@@ -20,7 +20,7 @@
       (newline)
       (loop (+ i 1)))))
 
-(quit)
+;(quit)
 
 (define (hello-again name)
   (display "Hello again, ")
@@ -29,3 +29,16 @@
   (newline))
 
 (hello-again "world")
+
+(define (read-name)
+  (display "What is your name?")
+  (newline)
+  (read))
+
+(define greeting "Hello, ")
+
+(let ((name (read-name)))
+  (display greeting)
+  (display name)
+  (display "!")
+  (newline))

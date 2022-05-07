@@ -157,6 +157,8 @@ Token fEquals(Instance *ins, Token *args, int n) {
 	}
 	else if(args[0].type != args[0].type)
 		return nilToken();
+	else if(args[0].type == NIL || args[0].type == HASHT)
+		return trueToken();
 	else if(args[0].type == STRING)
 		return (strcmp(args[0].val.s, args[1].val.s) == 0) ?
 			trueToken() : nilToken();
@@ -237,26 +239,55 @@ Token fLessEq(Instance *ins, Token *args, int n) {
 }
 
 Token fDefine(Instance *ins, Token *args, int n) {
-	assert(args[0].type == LIST);
-	for(int i = 0; i < args[0].num_children; i++)
-		assert(args[0].children[i].type == SYMBOL);
+	if(args[0].type == LIST) {
+		assert(args[0].type == LIST);
+		for(int i = 0; i < args[0].num_children; i++)
+			assert(args[0].children[i].type == SYMBOL);
 
-	int num_variables = args[0].num_children-1;
-	char **variables = malloc(sizeof(char*)*num_variables);
+		int num_variables = args[0].num_children-1;
+		char **variables = malloc(sizeof(char*)*num_variables);
 
-	for(int i = 0; i < num_variables; i++)
-		variables[i] = args[0].children[i+1].val.s;
+		for(int i = 0; i < num_variables; i++)
+			variables[i] = args[0].children[i+1].val.s;
 
-	addVarFunction(ins, args[0].children[0].val.s, args+1, n-1,
-			variables, num_variables);
+		addVarFunction(ins, args[0].children[0].val.s, args+1, n-1,
+				variables, num_variables);
 
-	free(variables);
-	return getVariable(ins, args[0].children[0].val.s);
+		free(variables);
+		return getVariable(ins, args[0].children[0].val.s);
+	}
+	else {
+		assert(args[0].type == SYMBOL);
+		assert(n == 2);
+		simplifyArgs(ins, args+1, 1);
+		defVariable(ins, args[0].val.s, args[1]);
+		return args[1];
+	}
 }
 
 Token fQuit(Instance *ins, Token *args, int n) {
 	ins->quit = true;
 	return nilToken();
+}
+
+Token fRead(Instance *ins, Token *args, int n) {
+	assert(n == 0);
+
+	int max = 30;
+	int len = 0;
+	char *s = malloc(max);
+	for(scanf("%c", &s[len++]); s[len-1] != '\n'; scanf("%c", &s[len++])) {
+		if(len > max-20) {
+			max += 50;
+			s = realloc(s, max);
+		}
+	}
+	s[len-1] = 0;
+
+	Token t;
+	t.type = STRING;
+	t.val.s = s;
+	return t;
 }
 
 void addSchemeFunctions(Instance *ins) {
@@ -276,5 +307,6 @@ void addSchemeFunctions(Instance *ins) {
 	addFunction(ins, fLess, "<");
 	addFunction(ins, fLessEq, "<=");
 	addFunction(ins, fDefine, "define");
-	addFunction(ins, fQuit, "quit");
+	addFunction(ins, fQuit, "exit");
+	addFunction(ins, fRead, "read");
 }
