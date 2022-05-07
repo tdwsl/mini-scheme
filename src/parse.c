@@ -223,7 +223,7 @@ void getList(Token *list, char *text) {
 				continue;
 			t->type = CHAR;
 			t->val.c = t->val.s[2];
-			free(t->val.s);
+			//free(t->val.s);
 		}
 	}
 
