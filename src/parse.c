@@ -225,6 +225,16 @@ void getList(Token *list, char *text) {
 			t->val.c = t->val.s[2];
 			//free(t->val.s);
 		}
+		else if(strcmp(t->val.s, "(") == 0) {
+			if(i < 1)
+				continue;
+			Token *p = &list->children[i-1];
+			if(strcmp(p->val.s, "#") == 0) {
+				char *s = p->val.s;
+				p->val.s = t->val.s;
+				t->val.s = s;
+			}
+		}
 	}
 
 	handleBraces(list);

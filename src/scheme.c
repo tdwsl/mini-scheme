@@ -50,6 +50,13 @@ defArithmeticFun(-, fMinus);
 defArithmeticFun(*, fMultiply);
 defArithmeticFun(/, fDivide);
 
+Token fModulo(Instance *ins, Token *args, int n) {
+	assert(n == 2);
+	simplifyArgs(ins, args, n);
+	assert(args[0].type == INTEGER && args[1].type == INTEGER);
+	return newInt(args[0].val.i % args[1].val.i);
+}
+
 Token fLet(Instance *ins, Token *args, int n) {
 	assert(args[0].type == LIST || args[0].type == SYMBOL);
 
@@ -374,6 +381,7 @@ void addSchemeFunctions(Instance *ins) {
 	addFunction(ins, fMinus, "-");
 	addFunction(ins, fMultiply, "*");
 	addFunction(ins, fDivide, "/");
+	addFunction(ins, fModulo, "modulo");
 	addFunction(ins, fLet, "let");
 	addFunction(ins, fSetf, "set!");
 	addFunction(ins, fBegin, "begin");
@@ -389,6 +397,7 @@ void addSchemeFunctions(Instance *ins) {
 	addFunction(ins, fStringEquals, "string=?");
 	addFunction(ins, fStringRef, "string-ref");
 	addFunction(ins, fVector, "vector");
+	addFunction(ins, fVector, "#");
 	addFunction(ins, fVectorRef, "vector-ref");
 	addFunction(ins, fLength, "length");
 }
